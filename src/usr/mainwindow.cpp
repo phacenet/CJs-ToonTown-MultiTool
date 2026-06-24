@@ -441,7 +441,7 @@ MainWindow::MainWindow(QWidget* parent)
         connect(ui->start_trick1Btn, &QPushButton::pressed, this, [this]()
             {
                 std::vector<ClickStep> click_steps = m_doodleTrainStartSteps;
-                click_steps.push_back(ClickStep{310, 61, 1500}); //trick 1
+                click_steps.push_back(ClickStep{312, 58, 1500}); //trick 1
                 doodleTrain(click_steps);
                 if(ui->labelBox->currentText() != "Optional Label")
                     ui->current_trickLabel->setText("Currently training: " + ui->labelBox->currentText());
@@ -451,7 +451,7 @@ MainWindow::MainWindow(QWidget* parent)
         connect(ui->start_trick2Btn, &QPushButton::pressed, this, [this]()
             {
                 std::vector<ClickStep> click_steps = m_doodleTrainStartSteps;
-                click_steps.push_back(ClickStep{310, 80, 1500}); //trick 2
+                click_steps.push_back(ClickStep{302, 78, 1500}); //trick 2
                 doodleTrain(click_steps);
                 if(ui->labelBox_2->currentText() != "Optional Label")
                     ui->current_trickLabel->setText("Currently training: " + ui->labelBox_2->currentText());
@@ -461,52 +461,22 @@ MainWindow::MainWindow(QWidget* parent)
         connect(ui->start_trick3Btn, &QPushButton::pressed, this, [this]()
             {
                 std::vector<ClickStep> click_steps = m_doodleTrainStartSteps;
-                click_steps.push_back(ClickStep{310, 99, 1500}); //trick 3
+                click_steps.push_back(ClickStep{308, 100, 1500}); //trick 3
                 doodleTrain(click_steps);
                 if(ui->labelBox_3->currentText() != "Optional Label")
                     ui->current_trickLabel->setText("Currently training: " + ui->labelBox_3->currentText());
                 else
-                    ui->current_trickLabel->setText("Currently training: Trick 3");
+                    ui->current_trickLabel->setText("Currently training: Trick 2");
             });
         connect(ui->start_trick4Btn, &QPushButton::pressed, this, [this]()
             {
                 std::vector<ClickStep> click_steps = m_doodleTrainStartSteps;
-                click_steps.push_back(ClickStep{310, 118, 1500}); //trick 4
+                click_steps.push_back(ClickStep{299, 119, 1500}); //trick 4
                 doodleTrain(click_steps);
-                if(ui->labelBox_4->currentText() != "Optional Label")
-                    ui->current_trickLabel->setText("Currently training: " + ui->labelBox_4->currentText());
+                if(ui->labelBox_3->currentText() != "Optional Label")
+                    ui->current_trickLabel->setText("Currently training: " + ui->labelBox_3->currentText());
                 else
-                    ui->current_trickLabel->setText("Currently training: Trick 4");
-            });
-        connect(ui->start_trick5Btn, &QPushButton::pressed, this, [this]()
-            {
-                std::vector<ClickStep> click_steps = m_doodleTrainStartSteps;
-                click_steps.push_back(ClickStep{310, 137, 1500}); //trick 5
-                doodleTrain(click_steps);
-                if(ui->labelBox_5->currentText() != "Optional Label")
-                    ui->current_trickLabel->setText("Currently training: " + ui->labelBox_5->currentText());
-                else
-                    ui->current_trickLabel->setText("Currently training: Trick 5");
-            });
-        connect(ui->start_trick6Btn, &QPushButton::pressed, this, [this]()
-            {
-                std::vector<ClickStep> click_steps = m_doodleTrainStartSteps;
-                click_steps.push_back(ClickStep{310, 156, 1500}); //trick 6
-                doodleTrain(click_steps);
-                if(ui->labelBox_6->currentText() != "Optional Label")
-                    ui->current_trickLabel->setText("Currently training: " + ui->labelBox_6->currentText());
-                else
-                    ui->current_trickLabel->setText("Currently training: Trick 6");
-            });
-        connect(ui->start_trick7Btn, &QPushButton::pressed, this, [this]()
-            {
-                std::vector<ClickStep> click_steps = m_doodleTrainStartSteps;
-                click_steps.push_back(ClickStep{310, 175, 1500}); //trick 7
-                doodleTrain(click_steps);
-                if(ui->labelBox_7->currentText() != "Optional Label")
-                    ui->current_trickLabel->setText("Currently training: " + ui->labelBox_7->currentText());
-                else
-                    ui->current_trickLabel->setText("Currently training: Trick 7");
+                    ui->current_trickLabel->setText("Currently training: Trick 2");
             });
 
     connect(ui->stop_trainingBtn, &QPushButton::pressed, this, [this]()
@@ -867,25 +837,8 @@ void MainWindow::populateToonList()
                     return;
                 }
                 QByteArray data = reply->readAll();
-
-                // Sniff the format from magic bytes so Qt routes to the right image
-                // plugin even when the server returns a generic Content-Type.
-                // WebP: first 4 bytes == "RIFF", bytes 8-11 == "WEBP"
-                const char* fmt = nullptr;
-                if(data.size() >= 12 &&
-                   data[0]=='R' && data[1]=='I' && data[2]=='F' && data[3]=='F' &&
-                   data[8]=='W' && data[9]=='E' && data[10]=='B' && data[11]=='P')
-                    fmt = "WEBP";
-
                 QPixmap pix;
-                bool ok = fmt ? pix.loadFromData(data, fmt) : pix.loadFromData(data);
-                if(!ok || pix.isNull())
-                {
-                    qDebug() << "Failed to decode toon image" << reply->url().toString()
-                             << "(hint:" << (fmt ? fmt : "auto") << ", bytes:" << data.size() << ")";
-                    reply->deleteLater();
-                    return;
-                }
+                pix.loadFromData(data);
                 image->setPixmap(pix.scaled(60, 60, Qt::KeepAspectRatio, Qt::SmoothTransformation));
                 reply->deleteLater();
             });
@@ -945,21 +898,9 @@ void MainWindow::loadSelectedToonImg(const QString& url, QLabel* label, QLabel* 
     {
         if (reply->error() == QNetworkReply::NoError)
         {
-            QByteArray data = reply->readAll();
-
-            // Same magic-byte sniff as in populateToonList
-            const char* fmt = nullptr;
-            if(data.size() >= 12 &&
-               data[0]=='R' && data[1]=='I' && data[2]=='F' && data[3]=='F' &&
-               data[8]=='W' && data[9]=='E' && data[10]=='B' && data[11]=='P')
-                fmt = "WEBP";
-
             QPixmap pix;
-            bool ok = fmt ? pix.loadFromData(data, fmt) : pix.loadFromData(data);
-            if(ok && !pix.isNull())
-                label->setPixmap(pix.scaled(label->size(), Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation));
-            else
-                qDebug() << "Failed to decode selected toon image (hint:" << (fmt ? fmt : "auto") << ")";
+            pix.loadFromData(reply->readAll());
+            label->setPixmap(pix.scaled(label->size(), Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation));
         }
         else
         {
@@ -1335,11 +1276,20 @@ void MainWindow::state_saveButtonPressed(uint8_t which_button)
                 return;
             }
 
-            //encrypt user data
-            std::string user_data = username_1 + '\n' + pname_1 + '\n' + alias_1 + '\n' + ui->fileLocation_input1->text().toStdString() + '\n';
+            // Fetch all stored entries, replace slot 0 in-place, re-encrypt.
+            // encrypt_to_file_append would append a duplicate instead of updating.
+            std::vector<enc::ToontownLogins> all_1 = enc::fetch_toontownCreds(
+                m_toontownLoginsPath.keyPath, m_toontownLoginsPath.credPath, m_numCreds);
+            all_1[0].username    = username_1;
+            all_1[0].password    = pname_1;
+            all_1[0].alias       = alias_1;
+            all_1[0].launcherPath = ui->fileLocation_input1->text().toStdString();
+            std::string blob_1;
+            for(const auto& e : all_1)
+                blob_1 += e.username + '\n' + e.password + '\n' + e.alias + '\n' + e.launcherPath + '\n';
             unsigned char key[crypto_secretbox_KEYBYTES];
             enc::load_keyfile(m_toontownLoginsPath.keyPath, key);
-            enc::encrypt_to_file_append(user_data, m_toontownLoginsPath.credPath, key);
+            enc::encrypt_to_file(blob_1, m_toontownLoginsPath.credPath, key);
             enc::store_numCreds(++m_numCreds);
 
             //show alias
@@ -1405,11 +1355,19 @@ void MainWindow::state_saveButtonPressed(uint8_t which_button)
                 return;
             }
 
-            //encrypt user data
-            std::string user_data = username_2 + '\n' + pname_2 + '\n' + alias_2 + '\n' + ui->fileLocation_input2->text().toStdString() + '\n';
+            // Fetch all stored entries, replace slot 1 in-place, re-encrypt.
+            std::vector<enc::ToontownLogins> all_2 = enc::fetch_toontownCreds(
+                m_toontownLoginsPath.keyPath, m_toontownLoginsPath.credPath, m_numCreds);
+            all_2[1].username    = username_2;
+            all_2[1].password    = pname_2;
+            all_2[1].alias       = alias_2;
+            all_2[1].launcherPath = ui->fileLocation_input2->text().toStdString();
+            std::string blob_2;
+            for(const auto& e : all_2)
+                blob_2 += e.username + '\n' + e.password + '\n' + e.alias + '\n' + e.launcherPath + '\n';
             unsigned char key[crypto_secretbox_KEYBYTES];
             enc::load_keyfile(m_toontownLoginsPath.keyPath, key);
-            enc::encrypt_to_file_append(user_data, m_toontownLoginsPath.credPath, key);
+            enc::encrypt_to_file(blob_2, m_toontownLoginsPath.credPath, key);
             enc::store_numCreds(++m_numCreds);
 
             //show alias
@@ -1476,11 +1434,19 @@ void MainWindow::state_saveButtonPressed(uint8_t which_button)
                 return;
             }
 
-            //encrypt user data
-            std::string user_data = username_3 + '\n' + pname_3 + '\n' + alias_3 + '\n' + ui->fileLocation_input3->text().toStdString() + '\n';
+            // Fetch all stored entries, replace slot 2 in-place, re-encrypt.
+            std::vector<enc::ToontownLogins> all_3 = enc::fetch_toontownCreds(
+                m_toontownLoginsPath.keyPath, m_toontownLoginsPath.credPath, m_numCreds);
+            all_3[2].username    = username_3;
+            all_3[2].password    = pname_3;
+            all_3[2].alias       = alias_3;
+            all_3[2].launcherPath = ui->fileLocation_input3->text().toStdString();
+            std::string blob_3;
+            for(const auto& e : all_3)
+                blob_3 += e.username + '\n' + e.password + '\n' + e.alias + '\n' + e.launcherPath + '\n';
             unsigned char key[crypto_secretbox_KEYBYTES];
             enc::load_keyfile(m_toontownLoginsPath.keyPath, key);
-            enc::encrypt_to_file_append(user_data, m_toontownLoginsPath.credPath, key);
+            enc::encrypt_to_file(blob_3, m_toontownLoginsPath.credPath, key);
             enc::store_numCreds(++m_numCreds);
 
             //show alias
@@ -1636,11 +1602,20 @@ void MainWindow::state_saveNoIncButtonPressed(uint8_t which_button)
                 return;
             }
 
-            //encrypt user data
-            std::string user_data = username_1 + '\n' + pname_1 + '\n' + alias_1 + '\n' + ui->fileLocation_input1->text().toStdString() + '\n';
+            // Fetch all stored entries, replace slot 0 in-place, re-encrypt.
+            // encrypt_to_file_append would append a duplicate instead of updating.
+            std::vector<enc::ToontownLogins> all_1 = enc::fetch_toontownCreds(
+                m_toontownLoginsPath.keyPath, m_toontownLoginsPath.credPath, m_numCreds);
+            all_1[0].username    = username_1;
+            all_1[0].password    = pname_1;
+            all_1[0].alias       = alias_1;
+            all_1[0].launcherPath = ui->fileLocation_input1->text().toStdString();
+            std::string blob_1;
+            for(const auto& e : all_1)
+                blob_1 += e.username + '\n' + e.password + '\n' + e.alias + '\n' + e.launcherPath + '\n';
             unsigned char key[crypto_secretbox_KEYBYTES];
             enc::load_keyfile(m_toontownLoginsPath.keyPath, key);
-            enc::encrypt_to_file_append(user_data, m_toontownLoginsPath.credPath, key);
+            enc::encrypt_to_file(blob_1, m_toontownLoginsPath.credPath, key);
 
             //update label
             if(!alias_1.empty())
@@ -1702,11 +1677,19 @@ void MainWindow::state_saveNoIncButtonPressed(uint8_t which_button)
                 return;
             }
 
-            //encrypt user data
-            std::string user_data = username_2 + '\n' + pname_2 + '\n' + alias_2 + '\n' + ui->fileLocation_input2->text().toStdString() + '\n';
+            // Fetch all stored entries, replace slot 1 in-place, re-encrypt.
+            std::vector<enc::ToontownLogins> all_2 = enc::fetch_toontownCreds(
+                m_toontownLoginsPath.keyPath, m_toontownLoginsPath.credPath, m_numCreds);
+            all_2[1].username    = username_2;
+            all_2[1].password    = pname_2;
+            all_2[1].alias       = alias_2;
+            all_2[1].launcherPath = ui->fileLocation_input2->text().toStdString();
+            std::string blob_2;
+            for(const auto& e : all_2)
+                blob_2 += e.username + '\n' + e.password + '\n' + e.alias + '\n' + e.launcherPath + '\n';
             unsigned char key[crypto_secretbox_KEYBYTES];
             enc::load_keyfile(m_toontownLoginsPath.keyPath, key);
-            enc::encrypt_to_file_append(user_data, m_toontownLoginsPath.credPath, key);
+            enc::encrypt_to_file(blob_2, m_toontownLoginsPath.credPath, key);
 
             //update label
             if(!alias_2.empty())
@@ -1769,11 +1752,19 @@ void MainWindow::state_saveNoIncButtonPressed(uint8_t which_button)
                 return;
             }
 
-            //encrypt user data
-            std::string user_data = username_3 + '\n' + pname_3 + '\n' + alias_3 + '\n' + ui->fileLocation_input3->text().toStdString() + '\n';
+            // Fetch all stored entries, replace slot 2 in-place, re-encrypt.
+            std::vector<enc::ToontownLogins> all_3 = enc::fetch_toontownCreds(
+                m_toontownLoginsPath.keyPath, m_toontownLoginsPath.credPath, m_numCreds);
+            all_3[2].username    = username_3;
+            all_3[2].password    = pname_3;
+            all_3[2].alias       = alias_3;
+            all_3[2].launcherPath = ui->fileLocation_input3->text().toStdString();
+            std::string blob_3;
+            for(const auto& e : all_3)
+                blob_3 += e.username + '\n' + e.password + '\n' + e.alias + '\n' + e.launcherPath + '\n';
             unsigned char key[crypto_secretbox_KEYBYTES];
             enc::load_keyfile(m_toontownLoginsPath.keyPath, key);
-            enc::encrypt_to_file_append(user_data, m_toontownLoginsPath.credPath, key);
+            enc::encrypt_to_file(blob_3, m_toontownLoginsPath.credPath, key);
 
             //update label
             if(!alias_3.empty())
