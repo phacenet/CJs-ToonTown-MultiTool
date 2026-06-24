@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.28)
 project(proj)
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -7,17 +8,30 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # stop namespace collision for Qt's emit and libsodium's internal emit
 add_compile_definitions(QT_NO_EMIT)
 
+#QT
+if(WIN32)
+	set(CMAKE_PREFIX_PATH "C:/Qt/6.11.1/msvc2022_64" ${CMAKE_PREFIX_PATH})
+endif()
+
+find_package(Qt6 REQUIRED COMPONENTS 
+	Widgets
+	Network
+	WebEngineWidgets
+)
+
+qt_standard_project_setup()
+
 #libcurl
 find_package(CURL REQUIRED)
 
-#QT
-find_package(Qt6 REQUIRED COMPONENTS Widgets)
-find_package(Qt6 REQUIRED COMPONENTS Network)
-qt_standard_project_setup()
 
 #libsodium
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(SODIUM REQUIRED libsodium)
+if(UNIX)
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(SODIUM REQUIRED libsodium)
+elseif(WIN32)
+    find_package(unofficial-sodium CONFIG REQUIRED)
+endif()
 
 #openssl
 find_package(OpenSSL REQUIRED)
@@ -40,9 +54,19 @@ foreach(sio_target sioclient sioclient_tls)
             CXX_STANDARD 17
             CXX_STANDARD_REQUIRED ON
         )
-        target_compile_options(${sio_target} PRIVATE -Wno-deprecated-declarations)
-    endif()
-endforeach()
+		
+			target_link_libraries(${sio_target} PRIVATE
+				OpenSSL::SSL
+				OpenSSL::Crypto
+			)
+	
+			if(MSVC)
+				target_compile_options(${sio_target} PRIVATE /wd4996)
+			else()
+				target_compile_options(${sio_target} PRIVATE -Wno-deprecated-declarations)
+			endif()
+		endif()
+	endforeach()
 
 #cpp files
 qt_add_executable(${PROJECT_NAME}
@@ -57,32 +81,48 @@ qt_add_executable(${PROJECT_NAME}
 )
 
 #libcurl
-target_link_libraries(${PROJECT_NAME} PRIVATE CURL::libcurl)
-#QT
-target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Widgets)
-target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Network)
-#QT webengine
-find_package(Qt6 REQUIRED COMPONENTS WebEngineWidgets)
-target_link_libraries(proj PRIVATE Qt6::WebEngineWidgets)
-#libsodium
-target_link_libraries(${PROJECT_NAME} PRIVATE ${SODIUM_LIBRARIES})
-#openssl + socket.io-client-cpp (TLS variant + SIO_TLS define required for ALPN fix to compile in)
-target_link_libraries(${PROJECT_NAME} PRIVATE sioclient_tls OpenSSL::SSL OpenSSL::Crypto)
+target_link_libraries(${PROJECT_NAME} PRIVATE 
+	CURL::libcurl
+	Qt6::Widgets
+	Qt6::Network
+	Qt6::WebEngineWidgets
+	sioclient_tls
+	OpenSSL::SSL
+	OpenSSL::Crypto
+)
+
+#this is the part i dont know where goes
+if(UNIX)
+    target_link_libraries(${PROJECT_NAME} PRIVATE ${SODIUM_LIBRARIES})
+    target_include_directories(${PROJECT_NAME} PRIVATE ${SODIUM_INCLUDE_DIRS})
+elseif(WIN32)
+    target_link_libraries(${PROJECT_NAME} PRIVATE unofficial-sodium::sodium)
+endif()
+
 target_compile_definitions(${PROJECT_NAME} PRIVATE SIO_TLS)
 
-#X11 for UNIX vs WIN32 libs
+# Platform specific input handling
 if(UNIX)
-    target_sources(proj PRIVATE src/usr/direct_inputs_x11.cpp)
+	target_sources(${PROJECT_NAME} PRIVATE src/usr/direct_inputs_x11.cpp)
     find_package(X11 REQUIRED)
-    target_link_libraries(proj PRIVATE X11::X11)
+	 target_link_libraries(${PROJECT_NAME} PRIVATE X11::X11)
 elseif(WIN32)
-    target_sources(proj PRIVATE src/usr/direct_inputs_win32.cpp)
-    target_link_libraries(proj PRIVATE user32)
+	target_sources(${PROJECT_NAME} PRIVATE src/usr/direct_inputs_win32.cpp)
+	target_link_libraries(${PROJECT_NAME} PRIVATE user32)
 endif()
 
 
+# include paths
 target_include_directories(${PROJECT_NAME} PRIVATE
 	${CMAKE_SOURCE_DIR}/inc
 	${CMAKE_SOURCE_DIR}/src/usr
-	${SODIUM_INCLUDE_DIRS}
 )
+
+#windows auto deploy
+if(WIN32)
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND C:/Qt/6.11.1/msvc2022_64/bin/windeployqt.exe
+        $<TARGET_FILE:${PROJECT_NAME}>
+        COMMENT "Running windeployqt..."
+    )
+endif()
