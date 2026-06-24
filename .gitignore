@@ -1,20 +1,11 @@
-# Ignore all .bin files anywhere in the repo
-*.bin
-
-# Ignore build directory at the repo root
+# Build artifacts
 /build/
-
-# Ignore compile_commands.json
+/AppDir/
+*.AppImage
+*.zip
 compile_commands.json
 
-#Ignore all .desktop files 
-*.desktop
-
-#Ignore .AppImage files
-*.AppImage
-
-#Ignore .rc files
-*.rc
-
-#Ignore AppDir folder
-/AppDir/
+# Credential and session state — never commit these
+config/ToonHQLogin/
+config/ToontownLogin/
+config/storeState/
