@@ -6,3 +6,15 @@
 
 # Ignore compile_commands.json
 compile_commands.json
+
+#Ignore all .desktop files 
+*.desktop
+
+#Ignore .AppImage files
+*.AppImage
+
+#Ignore .rc files
+*.rc
+
+#Ignore AppDir folder
+/AppDir/

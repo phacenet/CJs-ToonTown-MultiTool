@@ -441,7 +441,7 @@ MainWindow::MainWindow(QWidget* parent)
         connect(ui->start_trick1Btn, &QPushButton::pressed, this, [this]()
             {
                 std::vector<ClickStep> click_steps = m_doodleTrainStartSteps;
-                click_steps.push_back(ClickStep{312, 58, 1500}); //trick 1
+                click_steps.push_back(ClickStep{310, 61, 1500}); //trick 1
                 doodleTrain(click_steps);
                 if(ui->labelBox->currentText() != "Optional Label")
                     ui->current_trickLabel->setText("Currently training: " + ui->labelBox->currentText());
@@ -451,7 +451,7 @@ MainWindow::MainWindow(QWidget* parent)
         connect(ui->start_trick2Btn, &QPushButton::pressed, this, [this]()
             {
                 std::vector<ClickStep> click_steps = m_doodleTrainStartSteps;
-                click_steps.push_back(ClickStep{302, 78, 1500}); //trick 2
+                click_steps.push_back(ClickStep{310, 80, 1500}); //trick 2
                 doodleTrain(click_steps);
                 if(ui->labelBox_2->currentText() != "Optional Label")
                     ui->current_trickLabel->setText("Currently training: " + ui->labelBox_2->currentText());
@@ -461,22 +461,52 @@ MainWindow::MainWindow(QWidget* parent)
         connect(ui->start_trick3Btn, &QPushButton::pressed, this, [this]()
             {
                 std::vector<ClickStep> click_steps = m_doodleTrainStartSteps;
-                click_steps.push_back(ClickStep{308, 100, 1500}); //trick 3
+                click_steps.push_back(ClickStep{310, 99, 1500}); //trick 3
                 doodleTrain(click_steps);
                 if(ui->labelBox_3->currentText() != "Optional Label")
                     ui->current_trickLabel->setText("Currently training: " + ui->labelBox_3->currentText());
                 else
-                    ui->current_trickLabel->setText("Currently training: Trick 2");
+                    ui->current_trickLabel->setText("Currently training: Trick 3");
             });
         connect(ui->start_trick4Btn, &QPushButton::pressed, this, [this]()
             {
                 std::vector<ClickStep> click_steps = m_doodleTrainStartSteps;
-                click_steps.push_back(ClickStep{299, 119, 1500}); //trick 4
+                click_steps.push_back(ClickStep{310, 118, 1500}); //trick 4
                 doodleTrain(click_steps);
-                if(ui->labelBox_3->currentText() != "Optional Label")
-                    ui->current_trickLabel->setText("Currently training: " + ui->labelBox_3->currentText());
+                if(ui->labelBox_4->currentText() != "Optional Label")
+                    ui->current_trickLabel->setText("Currently training: " + ui->labelBox_4->currentText());
                 else
-                    ui->current_trickLabel->setText("Currently training: Trick 2");
+                    ui->current_trickLabel->setText("Currently training: Trick 4");
+            });
+        connect(ui->start_trick5Btn, &QPushButton::pressed, this, [this]()
+            {
+                std::vector<ClickStep> click_steps = m_doodleTrainStartSteps;
+                click_steps.push_back(ClickStep{310, 137, 1500}); //trick 5
+                doodleTrain(click_steps);
+                if(ui->labelBox_5->currentText() != "Optional Label")
+                    ui->current_trickLabel->setText("Currently training: " + ui->labelBox_5->currentText());
+                else
+                    ui->current_trickLabel->setText("Currently training: Trick 5");
+            });
+        connect(ui->start_trick6Btn, &QPushButton::pressed, this, [this]()
+            {
+                std::vector<ClickStep> click_steps = m_doodleTrainStartSteps;
+                click_steps.push_back(ClickStep{310, 156, 1500}); //trick 6
+                doodleTrain(click_steps);
+                if(ui->labelBox_6->currentText() != "Optional Label")
+                    ui->current_trickLabel->setText("Currently training: " + ui->labelBox_6->currentText());
+                else
+                    ui->current_trickLabel->setText("Currently training: Trick 6");
+            });
+        connect(ui->start_trick7Btn, &QPushButton::pressed, this, [this]()
+            {
+                std::vector<ClickStep> click_steps = m_doodleTrainStartSteps;
+                click_steps.push_back(ClickStep{310, 175, 1500}); //trick 7
+                doodleTrain(click_steps);
+                if(ui->labelBox_7->currentText() != "Optional Label")
+                    ui->current_trickLabel->setText("Currently training: " + ui->labelBox_7->currentText());
+                else
+                    ui->current_trickLabel->setText("Currently training: Trick 7");
             });
 
     connect(ui->stop_trainingBtn, &QPushButton::pressed, this, [this]()
