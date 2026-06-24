@@ -1,3 +1,0 @@
-/home/hunter/proj/ta/build/_deps/socketio-subbuild/CMakeFiles/socketio-populate.dir
-/home/hunter/proj/ta/build/_deps/socketio-subbuild/CMakeFiles/edit_cache.dir
-/home/hunter/proj/ta/build/_deps/socketio-subbuild/CMakeFiles/rebuild_cache.dir

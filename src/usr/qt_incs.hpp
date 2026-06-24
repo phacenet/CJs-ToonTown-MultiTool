@@ -27,3 +27,4 @@
 #include <QWebEngineView>
 #include <QWebEngineProfile>
 #include <QStandardPaths>
+#include <qssl.h>

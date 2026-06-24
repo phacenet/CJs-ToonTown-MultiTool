@@ -32,31 +32,42 @@ static UINT keysymToVK(unsigned int keysym)
     }
 }
 
+static HWND g_clickedWindow = nullptr;
+static HHOOK g_mouseHook = nullptr;
+
+static LRESULT CALLBACK mouseProc(int nCode, WPARAM wParam, LPARAM lParam)
+{
+    if(nCode >= 0 && wParam == WM_LBUTTONDOWN)
+    {
+        auto* ms = reinterpret_cast<MSLLHOOKSTRUCT*>(lParam);
+        g_clickedWindow = WindowFromPoint(ms->pt);
+        PostQuitMessage(0);
+        return 1; // eat the click
+    }
+    return CallNextHookEx(g_mouseHook, nCode, wParam, lParam);
+}
+
 namespace dir_inp
 {
     long get_window_via_click()
     {
-        // briefly change cursor to crosshair
-        HCURSOR oldCursor = SetCursor(LoadCursor(nullptr, IDC_CROSS));
-        SetCapture(nullptr);
+        Sleep(300); // same delay as the X11 version
 
-        // wait for a mouse click
+        g_clickedWindow = nullptr;
+        g_mouseHook = SetWindowsHookEx(WH_MOUSE_LL, mouseProc, nullptr, 0);
+        if(!g_mouseHook) return 0;
+
         MSG msg;
-        HWND result = nullptr;
         while(GetMessage(&msg, nullptr, 0, 0))
         {
-            if(msg.message == WM_LBUTTONDOWN)
-            {
-                POINT pt;
-                GetCursorPos(&pt);
-                result = WindowFromPoint(pt);
-                break;
-            }
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
         }
 
-        ReleaseCapture();
-        SetCursor(oldCursor);
-        return reinterpret_cast<long>(result);
+        UnhookWindowsHookEx(g_mouseHook);
+        g_mouseHook = nullptr;
+
+        return reinterpret_cast<long>(g_clickedWindow);
     }
 
     void send_key_to_window(long window_id, unsigned int key, bool press)

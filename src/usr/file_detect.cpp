@@ -7,38 +7,34 @@
 namespace fd
 {
 
-std::filesystem::path getHomeDir()
-{
-    return QDir::homePath().toStdString();
-}
+	std::filesystem::path getHomeDir()
+	{
+		 return QDir::homePath().toStdString();
+	}
 
-bool looksLikeTTREngine(const std::filesystem::path& p)
-{
-    std::error_code ec;
+	bool looksLikeTTREngine(const std::filesystem::path& p)
+	{
+		 std::error_code ec;
+		 if(!std::filesystem::is_regular_file(p, ec) || ec)
+			  return false;
 
-    if(!std::filesystem::is_regular_file(p, ec) || ec)
-        return false;
+		 std::string filename = p.filename().string();
 
-    std::string filename = p.filename().string();
+		 #ifdef _WIN32
+			  if(filename != "TTREngine.exe" && filename != "TTREngine64.exe")
+					return false;
+			  return true; // no permission check on Windows
+		 #else
+			if(filename != "TTREngine")
+				return false;
+			auto perms = std::filesystem::status(p, ec).permissions();
+			if(ec) return false;
+				return (perms & std::filesystem::perms::owner_exec) != std::filesystem::perms::none ||
+						(perms & std::filesystem::perms::group_exec) != std::filesystem::perms::none ||
+						(perms & std::filesystem::perms::others_exec) != std::filesystem::perms::none;
+		 #endif
+	}
 
-    #ifdef _WIN32
-        if(filename != "TTREngine.exe")
-            return false;
-    #else
-        if(filename != "TTREngine")
-            return false;
-    #endif
-
-    auto perms = std::filesystem::status(p, ec).permissions();
-    if(ec)
-        return false;
-
-    bool is_executable = (perms & std::filesystem::perms::owner_exec) != std::filesystem::perms::none ||
-                         (perms & std::filesystem::perms::group_exec) != std::filesystem::perms::none ||
-                         (perms & std::filesystem::perms::others_exec) != std::filesystem::perms::none;
-
-    return is_executable;
-}
 	std::optional<std::filesystem::path> findTTREngineAuto()
 	{
 		std::filesystem::path home = getHomeDir();
@@ -54,10 +50,16 @@ bool looksLikeTTREngine(const std::filesystem::path& p)
 				home / ".var/app/com.toontownrewritten.Launcher/data/TTREngine"
 			};
 		#elif _WIN32
-			if(const char* pf86 = std::getenv("ProgramFiles(x86)"))
-				candidates.push_back(std::filesystem::path(pf86) / "Toontown Rewritten" / "TTREngine.exe");
-			if(const char* pf = std::getenv("ProgramFiles"))
-				candidates.push_back(std::filesystem::path(pf) / "Toontown Rewritten" / "TTREngine.exe");
+			 if(const char* pf86 = std::getenv("ProgramFiles(x86)"))
+			 {
+				  candidates.push_back(std::filesystem::path(pf86) / "Toontown Rewritten" / "TTREngine64.exe");
+				  candidates.push_back(std::filesystem::path(pf86) / "Toontown Rewritten" / "TTREngine.exe");
+			 }
+			 if(const char* pf = std::getenv("ProgramFiles"))
+			 {
+				  candidates.push_back(std::filesystem::path(pf) / "Toontown Rewritten" / "TTREngine64.exe");
+				  candidates.push_back(std::filesystem::path(pf) / "Toontown Rewritten" / "TTREngine.exe");
+			 }
 		#endif
 
 		for(const auto& cand : candidates)

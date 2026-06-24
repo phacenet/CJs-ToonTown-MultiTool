@@ -77,6 +77,11 @@ MainWindow::MainWindow(QWidget* parent)
     ui->minBtn->setCursor(Qt::PointingHandCursor);
     ui->storeLoginCheckbox->setCursor(Qt::PointingHandCursor);
 
+    //trying to fix Win32 version toon image fetching not always fetching all toon images
+    QSslConfiguration sslConfig = QSslConfiguration::defaultConfiguration();
+    sslConfig.setProtocol(QSsl::TlsV1_2OrLater);
+    QSslConfiguration::setDefaultConfiguration(sslConfig);
+
 
     //------------------------------------------------------------------------------------------
     //login page
