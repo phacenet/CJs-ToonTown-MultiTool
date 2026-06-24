@@ -142,26 +142,64 @@ if(WIN32)
 		REQUIRED
 	)
 
-	# Copy non-Qt runtime DLLs (libcurl, OpenSSL, libsodium, etc.) next to
-	# the exe for every build type so the build directory is always runnable.
-	# TARGET_RUNTIME_DLLS walks all linked imported targets automatically.
-	add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different
-			$<TARGET_RUNTIME_DLLS:${PROJECT_NAME}>
-			$<TARGET_FILE_DIR:${PROJECT_NAME}>
-		COMMAND_EXPAND_LISTS
-		COMMENT "Copying runtime DLLs (curl, OpenSSL, sodium)..."
+	# --------------------------------------------------------------------------
+	# Third-party DLL deployment (libcurl, OpenSSL, libsodium, zlib)
+	#
+	# TARGET_RUNTIME_DLLS silently skips targets that vcpkg declares as
+	# UNKNOWN IMPORTED rather than SHARED IMPORTED — OpenSSL does this.
+	# Instead, derive the vcpkg bin directory from CURL::libcurl (which vcpkg
+	# does declare correctly) and glob the specific DLLs we need.
+	# --------------------------------------------------------------------------
+	get_target_property(_curl_dll CURL::libcurl IMPORTED_LOCATION_RELEASE)
+	if(NOT _curl_dll OR _curl_dll MATCHES "NOTFOUND")
+		get_target_property(_curl_dll CURL::libcurl IMPORTED_LOCATION)
+	endif()
+
+	# IMPORTED_LOCATION is the DLL itself for SHARED targets; for targets where
+	# it points to the .lib, look in the sibling bin/ directory instead.
+	if(_curl_dll MATCHES "\\.dll$")
+		get_filename_component(_vcpkg_bin "${_curl_dll}" DIRECTORY)
+	else()
+		get_filename_component(_vcpkg_lib_dir "${_curl_dll}" DIRECTORY)
+		set(_vcpkg_bin "${_vcpkg_lib_dir}/../bin")
+		cmake_path(NORMAL_PATH _vcpkg_bin)
+	endif()
+
+	file(GLOB _third_party_dlls
+		"${_vcpkg_bin}/libcurl*.dll"
+		"${_vcpkg_bin}/libssl*.dll"
+		"${_vcpkg_bin}/libcrypto*.dll"
+		"${_vcpkg_bin}/libsodium*.dll"
+		"${_vcpkg_bin}/zlib1.dll"    # vcpkg names it zlib1, not z
+		"${_vcpkg_bin}/z.dll"        # keep as fallback
 	)
 
-	# Only run windeployqt on Release builds — no point deploying Qt DLLs
-	# during debug iteration, and it adds noticeable build time.
+	if(NOT _third_party_dlls)
+		message(WARNING
+			"No third-party DLLs found in ${_vcpkg_bin}. "
+			"The packaged app will be missing libcurl/OpenSSL/libsodium.")
+	else()
+		message(STATUS "Third-party DLLs to deploy: ${_third_party_dlls}")
+	endif()
+
+	# Copy third-party DLLs next to the exe on every build (Debug and Release)
+	# so the build directory is always runnable.
+	add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+			${_third_party_dlls}
+			$<TARGET_FILE_DIR:${PROJECT_NAME}>
+		COMMAND_EXPAND_LISTS
+		COMMENT "Copying third-party DLLs (curl, OpenSSL, sodium, zlib)..."
+	)
+
+	# Run windeployqt only on Release builds — Qt DLL deployment is slow and
+	# not needed during debug iteration.
 	add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 		COMMAND "$<$<CONFIG:Release>:${WINDEPLOYQT}>"
 			--release
 			--no-translations        # saves ~20 MB
-			--no-system-d3d-compiler # saves ~5 MB, not needed at runtime
-			--no-opengl-sw           # saves ~15 MB; skip Mesa fallback
-			                         # (users running TTR already have a GPU)
+			--no-system-d3d-compiler # saves ~5 MB
+			--no-opengl-sw           # saves ~15 MB; TTR users have a GPU
 			"$<TARGET_FILE:${PROJECT_NAME}>"
 		COMMENT "Running windeployqt..."
 		VERBATIM
@@ -174,15 +212,11 @@ endif()
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION .)
 install(DIRECTORY "${CMAKE_SOURCE_DIR}/config" DESTINATION .)
 
-# Install non-Qt runtime DLLs (libcurl, OpenSSL, libsodium).
-# windeployqt handles Qt's own DLLs in the install(CODE) block below.
 if(WIN32)
-	install(FILES $<TARGET_RUNTIME_DLLS:${PROJECT_NAME}> DESTINATION .)
-endif()
+	# Third-party DLLs
+	install(FILES ${_third_party_dlls} DESTINATION .)
 
-# Run windeployqt against the install prefix so CPack gets the Qt DLLs too.
-# The post-build step above only covers the build tree.
-if(WIN32)
+	# Qt DLLs — run windeployqt against the staging directory
 	install(CODE "
 		execute_process(
 			COMMAND \"${WINDEPLOYQT}\"
@@ -198,8 +232,7 @@ endif()
 # -------------------------------------------------------------------------
 # CPack  (run: cpack -C Release  after a Release build)
 # -------------------------------------------------------------------------
-set(CPACK_GENERATOR "ZIP")           # produces TTR-MultiTool-x.y.z-win64.zip
-                                     # switch to "NSIS" for a click-through installer
+set(CPACK_GENERATOR "ZIP")
 set(CPACK_PACKAGE_NAME "TTR-MultiTool")
 set(CPACK_PACKAGE_VERSION "1.0.0")
 set(CPACK_PACKAGE_VENDOR "hunter")
