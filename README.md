@@ -65,6 +65,8 @@ A **ToonTown Rewritten** (partial CC support) MultiTool for **Linux and Windows*
     - Doodle Training
     - Invasion Monitor
 
+- *Note: All apps can be run concurrently, you can dual toon, auto group accept, view ToonHQ, and train a doodle, all while monitoring invasions if you so wish.*
+
 - **Login**
   - The Tool requires you login with your **ToonHQ** login credentials. Several features are integrated with the ToonHQ website, and require the login information. You can optionally prevent the encrypted storage of your credentials by ticking the
     "Don't store my login information" checkbox on the main page. This setting will be remembered and persist after exiting, until unchecked.
