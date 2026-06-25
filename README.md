@@ -75,6 +75,7 @@ A **ToonTown Rewritten** (partial CC support) MultiTool for **Linux and Windows*
 
 - **Launch TTR**
     - Launches ToonTown Rewritten from the app. Can store up to **3** different logins at once. All logins are encrypted and stored locally in the config/ToonHQLogin or config/ToontownLogin folders.
+    - Use your ToonTown Rewritten Username and Password, as you would normally through the Official Launcher.
     - The program automatically detects common installation paths, and manual input is not necessary unless detection fails,
     - The blue button launches the saved client, the yellow pencil button edits the stored login, the red x button removes the stored client, and the folder icon provides a manual override to the
       automatic installation detection.
