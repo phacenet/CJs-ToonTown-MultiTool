@@ -66,9 +66,51 @@ A **ToonTown Rewritten** (partial CC support) MultiTool for **Linux and Windows*
     - Invasion Monitor
 - **Launch TTR**
     - Launches ToonTown Rewritten from the app. Can store up to **3** different logins at once. All logins are encrypted and stored locally in the config/ToonHQLogin or config/ToontownLogin folders.
-    - 
+    - The program automatically detects common installation paths, and manual input is not necessary unless detection fails,
+    - The blue button launches the saved client, the yellow pencil button edits the stored login, the red x button removes the stored client, and the folder icon provides a manual override to the
+      automatic installation detection.
+<p align="center">
+  <img width="276" height="203" alt="image" src="https://github.com/user-attachments/assets/8309511c-7cba-440d-8976-e68db6614aee" />
+  <img width="276" height="203" alt="image" src="https://github.com/user-attachments/assets/2ac2a3a1-6eb3-45ce-b497-5f1896fd4c9a" />
+</p>
 
+- **ToonHQ Auto Group Accept**
+  - A toon is selected from the synced ToonHQ toonlist, and when a group is created in-game, the app will automatically verify that group, and the user need not navigate to the ToonHQ website to accept that group's creation.
+  - Only one toon can be connected at a time.
+  - *Note: Toons will ONLY appear on the list if they are synced through the ToonHQ website*
+<p align="center">
+  <img width="276" height="203" alt="image" src="https://github.com/user-attachments/assets/8c25b5dc-01c1-4a94-9ee2-2a41e641da2f" />
+  <img width="276" height="203" alt="image" src="https://github.com/user-attachments/assets/a5301c7d-2279-49c4-acc2-5cf60f1e53c3" />
+</p>
 
+- **ToonHQ Web Page**
+  - An embedded ToonHQ webpage. To prevent having to navigate back and forth from the ToonHQ webpage to find groups. Once logged in, the browser will store cookies and remember who you are, preventing the need for repeated logins.
+<p align="center">
+  <img width="276" height="203" alt="image" src="https://github.com/user-attachments/assets/af0487fb-ef50-40ed-9f57-19ab46143462" />
+</p>
+
+- **Dual Toon**
+    - Sends keyboard inputs to two separate toons, simultaneously.
+    - Only two keyboard schemes are supported: [WASD, SPACE to jump, ENTER to open SpeedChat+] and [ARROW_KEYS, SPACE to jump, ENTER to open SpeedChat+]
+    - Simply click the **Select Arrow Keys Toon** and then the window of the toon you wish to send inputs to, then the **Select WASD Toon** and the window you wish to send inputs to.
+    - Window focus **DOES NOT** matter. Keyboard inputs are sent regardless if the window has focus.
+    - The list of *MIRRORED* inputs are: [DELETE, HOME, END, SPACE, ENTER]
+    - *Note: Pressing the enter key will enter chat mode, preventing keyboard inputs from being read. If you experience trouble getting inputs, check the Dual Toon page to make sure you haven't accidentally entered chat mode*
+  <p align="center">
+    <img width="276" height="203" alt="image" src="https://github.com/user-attachments/assets/1bfc5142-cf33-40d7-8be5-40c5d9bad886" />
+    <img width="276" height="203" alt="image" src="https://github.com/user-attachments/assets/5ea1d51b-9c65-4e7c-833b-df5c5cc91356" />
+    <img width="276" height="203" alt="image" src="https://github.com/user-attachments/assets/1d697a72-40b2-4a99-a6b0-ff699e34fa9b" />
+  </p>
+
+  - **Doodle Training**
+    - A doodle training autoclicker. Requires screen resolution to be set to 800x600 Windowed in the display settings for screen-space coordinates to behave as expected.
+    - Usage is similar to the **Dual Toon** page. Click on the trick you want to train, then the window to send mouse inputs to. Once again, the window does **NOT** require focus, and does **NOT** steal mouse focus. You use your computer as usual while the autoclicker does its work.
+    - Because trick ordering can be different per toon, there is an optional label beside each trick, which persists after application exit and reopen. It does not have any actual affect on the program execution, it is purely visual.
+  <p align="center">
+    <img width="276" height="203" alt="image" src="https://github.com/user-attachments/assets/9b18619e-e9f7-444e-9241-0962a2dae1d7" />
+    <img width="276" height="203" alt="image" src="https://github.com/user-attachments/assets/abf49690-e809-4436-a75c-c880dbc8ce39" />
+
+  </p>
 ---
 
 ## Install
